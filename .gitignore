@@ -16,6 +16,7 @@ target/
 *.iws
 *.iml
 *.ipr
+*/target/**
 
 ### Eclipse ###
 .apt_generated
@@ -23,7 +24,6 @@ target/
 .factorypath
 .project
 .settings
-.springBeans
 .sts4-cache
 
 ### NetBeans ###
