@@ -4,7 +4,7 @@ logging:
   loggers:
     com.baku: DEBUG
 
-country: ${COUNTRY_NAME}
+country: ${COUNTRY_NAME:-India}
 
 server:
   applicationContextPath: /
