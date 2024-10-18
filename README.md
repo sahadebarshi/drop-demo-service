@@ -1,4 +1,4 @@
-# dropBookmarks
+# DropBookmarks
 
 How to start the dropBookmarks application
 ---
