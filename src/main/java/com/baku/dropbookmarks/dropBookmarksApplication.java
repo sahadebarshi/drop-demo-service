@@ -1,6 +1,8 @@
 package com.baku.dropbookmarks;
 
+import com.baku.dropbookmarks.job.QuartzSchedulerManager;
 import com.baku.dropbookmarks.resources.DropMultiConfig;
+import com.baku.dropbookmarks.resources.ProductController;
 import com.hivemq.client.mqtt.MqttClient;
 import com.hivemq.client.mqtt.mqtt5.Mqtt5BlockingClient;
 import io.dropwizard.auth.AuthDynamicFeature;
@@ -13,12 +15,18 @@ import io.dropwizard.core.setup.Environment;
 import com.baku.dropbookmarks.auth.TestAuthenticator;
 import com.baku.dropbookmarks.core.User;
 
+import io.dropwizard.lifecycle.Managed;
+import jakarta.annotation.PreDestroy;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RoundRobinPartitioner;
 import org.eclipse.jetty.security.DefaultAuthenticatorFactory;
 
 import com.baku.dropbookmarks.resources.HelloController;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
+import org.quartz.SchedulerFactory;
+import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,23 +60,38 @@ public class dropBookmarksApplication extends Application<dropBookmarksConfigura
 
     @Override
     public void run(final dropBookmarksConfiguration configuration,
-                    final Environment environment) throws InterruptedException {
+                    final Environment environment) throws InterruptedException, SchedulerException {
     	
-    	environment.jersey().register(new HelloController()
-    			);
+    	environment.jersey().register(new HelloController());
+        environment.jersey().register(new ProductController());
     	
     	environment.jersey().register(new AuthDynamicFeature(new BasicCredentialAuthFilter.Builder<User>()
-    	        .setAuthenticator(new TestAuthenticator())
+    	        .setAuthenticator(new TestAuthenticator("baku"))
     	        .setRealm("SECURITY REALM")
     	        .buildAuthFilter()));
     	environment.jersey().register(new AuthValueFactoryProvider.Binder<>(User.class));
 
-        System.out.println("COUNTRY NAME IS "+configuration.getCountryName());
+        log.info("COUNTRY NAME IS "+configuration.getCountryName());
         String flag="";
         if("K".equalsIgnoreCase(flag))
             kafkaProducer();
         else if("M".equalsIgnoreCase(flag))
             mqttClient();
+
+        // JOB SETTING
+
+        QuartzSchedulerManager quartzSchedulerManager = new QuartzSchedulerManager();
+        environment.lifecycle().manage(new Managed() {
+            @Override
+            public void start() throws Exception {
+                quartzSchedulerManager.startQuartzScheduler();
+            }
+
+            @Override
+            public void stop() throws Exception {
+                quartzSchedulerManager.stopQuartzScheduler();
+            }
+        });
 
     }
   private static void kafkaProducer()
@@ -94,7 +117,7 @@ public class dropBookmarksApplication extends Application<dropBookmarksConfigura
       //Create the producer
       KafkaProducer<String, String> producer = new KafkaProducer<>(properties);
 
-      //Create producer record withot key
+      //Create producer record without key
       ProducerRecord<String, String> producerRecord =
               new ProducerRecord<>("baku_first_topic","Hello Baku!!!__2");
 

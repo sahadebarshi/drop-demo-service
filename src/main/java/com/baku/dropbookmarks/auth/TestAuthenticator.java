@@ -10,6 +10,12 @@ import io.dropwizard.auth.basic.BasicCredentials;
 
 public class TestAuthenticator implements Authenticator<BasicCredentials, User>
 {
+	private  String password;
+
+	public TestAuthenticator(String password){
+		super();
+		this.password = password;
+	}
 
 	@Override
 	public Optional<User> authenticate(BasicCredentials credentials) throws AuthenticationException {
