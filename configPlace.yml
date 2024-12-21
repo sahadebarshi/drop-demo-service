@@ -1,3 +1,4 @@
+
 myAppName: ${APP_NAME}
 defaultCountValue: ${COUNT_VALUE:-5}
 

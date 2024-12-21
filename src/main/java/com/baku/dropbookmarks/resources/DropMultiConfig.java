@@ -32,6 +32,7 @@ public class DropMultiConfig implements ConfigurationSourceProvider {
     @Override
     public InputStream open(String path) throws IOException {
         String[] fileNames= path.contains("|") ? path.split("\\|"): new String[]{path};
+        System.out.println("---NUMBER CONFIG FILES---> "+fileNames.length);
         Vector<InputStream> inputStream = new Vector<>();
         Arrays.stream(fileNames).forEach(str->
                 {

@@ -80,7 +80,7 @@ public class dropBookmarksApplication extends Application<dropBookmarksConfigura
 
         // JOB SETTING
 
-        QuartzSchedulerManager quartzSchedulerManager = new QuartzSchedulerManager();
+        QuartzSchedulerManager quartzSchedulerManager = new QuartzSchedulerManager(configuration);
         environment.lifecycle().manage(new Managed() {
             @Override
             public void start() throws Exception {
@@ -89,6 +89,7 @@ public class dropBookmarksApplication extends Application<dropBookmarksConfigura
 
             @Override
             public void stop() throws Exception {
+                log.info("----------------STOP METHOD--------------------------");
                 quartzSchedulerManager.stopQuartzScheduler();
             }
         });

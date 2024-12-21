@@ -15,3 +15,6 @@ server:
   adminConnectors:
     - type: http
       port: 8083
+
+quartzJobConfig:
+  threadPoolSize: 2

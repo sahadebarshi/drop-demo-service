@@ -1,5 +1,6 @@
 package com.baku.dropbookmarks.job;
 
+import com.baku.dropbookmarks.dropBookmarksConfiguration;
 import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
@@ -14,14 +15,14 @@ public class QuartzSchedulerManager {
     private Scheduler scheduler;
     private SchedulerFactory schedulerFactory;
 
-    public QuartzSchedulerManager(){
+    public QuartzSchedulerManager(dropBookmarksConfiguration configuration){
         try {
             Properties props = new Properties();
             props.setProperty("org.quartz.threadPool.threadCount", "1");
             //this.scheduler = StdSchedulerFactory.getDefaultScheduler();
             this.schedulerFactory = new StdSchedulerFactory(props);
             this.scheduler = schedulerFactory.getScheduler();
-
+            log.error("CONFIG VALUE FOR THREAD POOL: {}", configuration.getQuartzJobConfig().threadPoolSize);
         } catch (Exception e) {
             log.error("Error initializing Quartz Scheduler", e);
         }
@@ -41,7 +42,7 @@ public class QuartzSchedulerManager {
         }
     }
 
-    @PreDestroy
+    //@PreDestroy
     public void stopQuartzScheduler() {
         try {
             if (scheduler != null && scheduler.isStarted()) {
